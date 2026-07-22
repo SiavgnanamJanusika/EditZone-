@@ -1,0 +1,21 @@
+# Dependencies and generated builds
+node_modules/
+dist/
+build/
+__pycache__/
+*.py[cod]
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Runtime uploads and logs
+editzone-backend/app/uploads/*
+!editzone-backend/app/uploads/.gitkeep
+*.log
+
+# Editor and OS files
+.DS_Store
+.vscode/
+.idea/
