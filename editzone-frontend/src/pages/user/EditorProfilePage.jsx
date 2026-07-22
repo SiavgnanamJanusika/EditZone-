@@ -4,6 +4,8 @@ import { Star, MapPin, ArrowLeft, Eye, Camera, MessageCircle, Play, Images, Badg
 import UserNavbar from "../../components/navbar/UserNavbar";
 import { Loader, PrimaryButton, OutlineButton, Badge } from "../../components/common/UI";
 import api from "../../services/api";
+import { isVideoMedia, resolveMediaUrl } from "../../services/media";
+import MediaViewer from "../../components/common/MediaViewer";
 
 export default function EditorProfilePage() {
   const { editorId } = useParams();
@@ -15,6 +17,7 @@ export default function EditorProfilePage() {
   const [form, setForm] = useState({ project_title: "", project_description: "" });
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+  const [activeReel, setActiveReel] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -62,7 +65,7 @@ export default function EditorProfilePage() {
           <div className="px-5 pb-7 sm:px-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-end">
             {editor.profile_picture ? (
-              <img src={editor.profile_picture} alt={`${editor.username}'s profile`} className="-mt-14 h-28 w-28 shrink-0 rounded-full border-4 border-[#111827] object-cover shadow-2xl sm:h-32 sm:w-32" />
+              <img src={resolveMediaUrl(editor.profile_picture)} alt={`${editor.username}'s profile`} className="-mt-14 h-28 w-28 shrink-0 rounded-full border-4 border-[#111827] object-cover shadow-2xl sm:h-32 sm:w-32" />
             ) : (
               <div className="-mt-14 flex h-28 w-28 shrink-0 items-center justify-center rounded-full border-4 border-[#111827] bg-brand-gradient text-2xl font-bold text-white shadow-2xl sm:h-32 sm:w-32">
                 {(editor.username || "E").slice(0, 2).toUpperCase()}
@@ -81,7 +84,7 @@ export default function EditorProfilePage() {
               </div>
             </div>
             <div className="sm:text-right">
-              <p className="text-2xl font-bold text-brand-cyan">${editor.hourly_rate || 0}<span className="text-sm text-gray-500">/hr</span></p>
+              <p className="text-2xl font-bold text-brand-cyan">Rs. {Number(editor.hourly_rate || 0).toLocaleString("en-LK")}<span className="text-sm text-gray-500">/hr</span></p>
               <PrimaryButton className="mt-3 rounded-full" onClick={() => setShowRequestForm(true)}><MessageCircle size={17} /> Send Request</PrimaryButton>
             </div>
           </div>
@@ -96,12 +99,12 @@ export default function EditorProfilePage() {
               <div className="mb-4 flex items-center justify-between"><div><p className="flex items-center gap-2 font-semibold"><Images size={18} className="text-cyan-300" /> Project Reels</p><p className="mt-1 text-xs text-slate-500">Tap a reel to view the full project</p></div><span className="text-xs text-slate-500">{editor.portfolio_links.length} projects</span></div>
               <div className="reels-grid grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                 {editor.portfolio_links.map((link, i) => (
-                  <a key={i} href={link} target="_blank" rel="noreferrer" className="reel-card group relative aspect-[9/14] overflow-hidden rounded-2xl border border-white/10 bg-brand-panel">
-                    {/\.(mp4|webm|mov)(\?|$)/i.test(link) ? <video src={link} muted playsInline className="h-full w-full object-cover" /> : <img src={link} alt={`Project reel ${i + 1}`} className="h-full w-full object-cover" />}
+                  <button type="button" key={i} onClick={() => setActiveReel({ link, index: i })} aria-label={`Open project reel ${i + 1}`} className="reel-card group relative aspect-[9/14] overflow-hidden rounded-2xl border border-white/10 bg-brand-panel text-left">
+                    {isVideoMedia(link) ? <video src={resolveMediaUrl(link)} muted playsInline preload="metadata" className="h-full w-full object-cover" /> : <img src={resolveMediaUrl(link)} alt={`Project reel ${i + 1}`} className="h-full w-full object-cover" />}
                     <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/10" />
                     <span className="absolute left-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-black/30 text-white backdrop-blur-md"><Play size={14} fill="currentColor" /></span>
                     <span className="absolute bottom-3 left-3 text-xs font-semibold text-white">Project {String(i + 1).padStart(2, "0")}</span>
-                  </a>
+                  </button>
                 ))}
               </div>
             </div>
@@ -158,6 +161,7 @@ export default function EditorProfilePage() {
           </div>
         )}
       </section>
+      <MediaViewer item={activeReel?.link} title={activeReel ? `Project reel ${activeReel.index + 1}` : "Project reel"} onClose={() => setActiveReel(null)} />
     </div>
   );
 }

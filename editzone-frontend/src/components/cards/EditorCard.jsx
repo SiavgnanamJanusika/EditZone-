@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Star, MapPin } from "lucide-react";
+import { resolveMediaUrl } from "../../services/media";
 
 export default function EditorCard({ editor }) {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export default function EditorCard({ editor }) {
     >
       <div className="flex items-center gap-4 mb-5">
         {editor.profile_picture ? (
-          <img src={editor.profile_picture} alt={editor.username} className="w-20 h-20 rounded-2xl object-cover border border-white/10 transition-transform duration-500 group-hover:scale-105" />
+          <img src={resolveMediaUrl(editor.profile_picture)} alt={editor.username} className="w-20 h-20 rounded-2xl object-cover border border-white/10 transition-transform duration-500 group-hover:scale-105" />
         ) : (
           <div className="w-20 h-20 rounded-2xl bg-brand-gradient flex items-center justify-center text-white text-xl font-bold shadow-lg transition-transform duration-500 group-hover:scale-105">
             {initials}
@@ -43,7 +44,7 @@ export default function EditorCard({ editor }) {
           <span>{editor.rating_avg || 0}</span>
           <span className="text-gray-500">({editor.rating_count || 0})</span>
         </div>
-        <span className="font-semibold text-brand-cyan">${editor.hourly_rate || 0}/hr</span>
+        <span className="font-semibold text-brand-cyan">Rs. {Number(editor.hourly_rate || 0).toLocaleString("en-LK")}/hr</span>
       </div>
     </button>
   );

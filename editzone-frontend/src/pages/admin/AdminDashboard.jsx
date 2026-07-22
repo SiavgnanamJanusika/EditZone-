@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Users, Clapperboard, FolderKanban, DollarSign, Clock, CheckCircle2 } from "lucide-react";
+import { Users, Clapperboard, FolderKanban, Banknote, Clock, CheckCircle2 } from "lucide-react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { Loader } from "../../components/common/UI";
 import api from "../../services/api";
@@ -17,8 +17,8 @@ export default function AdminDashboard() {
     { icon: FolderKanban, label: "Total Projects", value: stats.total_projects },
     { icon: CheckCircle2, label: "Completed Projects", value: stats.completed_projects },
     { icon: Clock, label: "Pending Verification", value: stats.pending_verification },
-    { icon: DollarSign, label: "Total Revenue", value: `$${stats.total_revenue}` },
-    { icon: DollarSign, label: "Platform Commission", value: `$${stats.total_platform_commission}` },
+    { icon: Banknote, label: "Total Revenue", value: `Rs. ${Number(stats.total_revenue || 0).toLocaleString("en-LK")}` },
+    { icon: Banknote, label: "Platform Commission", value: `Rs. ${Number(stats.total_platform_commission || 0).toLocaleString("en-LK")}` },
   ];
 
   return (
