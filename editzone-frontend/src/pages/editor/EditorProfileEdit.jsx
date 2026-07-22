@@ -3,6 +3,8 @@ import { BadgeCheck, Camera, Images, MapPin, Play, Plus, Sparkles } from "lucide
 import EditorNavbar from "../../components/navbar/EditorNavbar";
 import { Loader, Input, PrimaryButton, ErrorText } from "../../components/common/UI";
 import api from "../../services/api";
+import { isVideoMedia, resolveMediaUrl } from "../../services/media";
+import MediaViewer from "../../components/common/MediaViewer";
 
 const CATEGORIES = ["Image Editor", "TikTok Editor", "Video Editor"];
 
@@ -15,6 +17,7 @@ export default function EditorProfileEdit() {
   const [skillInput, setSkillInput] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [activeReel, setActiveReel] = useState(null);
 
   useEffect(() => {
     api.get("/editors/me/profile").then((res) => setProfile(res.data)).finally(() => setLoading(false));
@@ -105,7 +108,7 @@ export default function EditorProfileEdit() {
           <div className="px-5 pb-7 sm:px-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
             {profile.profile_picture ? (
-              <img src={profile.profile_picture} alt={`${profile.username}'s profile`} className="-mt-14 h-28 w-28 rounded-full border-4 border-[#111827] object-cover shadow-2xl sm:h-32 sm:w-32" />
+              <img src={resolveMediaUrl(profile.profile_picture)} alt={`${profile.username}'s profile`} className="-mt-14 h-28 w-28 rounded-full border-4 border-[#111827] object-cover shadow-2xl sm:h-32 sm:w-32" />
             ) : (
               <div className="-mt-14 flex h-28 w-28 items-center justify-center rounded-full border-4 border-[#111827] bg-brand-gradient text-2xl font-bold text-white shadow-2xl sm:h-32 sm:w-32">
                 {(profile.username || "E").slice(0, 2).toUpperCase()}
@@ -147,7 +150,7 @@ export default function EditorProfileEdit() {
             </div>
 
             <Input placeholder="Location" maxLength={100} value={profile.location || ""} onChange={(e) => setProfile({ ...profile, location: e.target.value })} />
-            <Input type="number" min="0" max="1000000" step="0.01" placeholder="Hourly Rate (USD)" value={profile.hourly_rate || ""} onChange={(e) => setProfile({ ...profile, hourly_rate: e.target.value })} />
+            <Input type="number" min="0" max="1000000" step="0.01" placeholder="Hourly Rate (LKR)" value={profile.hourly_rate || ""} onChange={(e) => setProfile({ ...profile, hourly_rate: e.target.value })} />
 
             <textarea
               rows={4}
@@ -190,12 +193,12 @@ export default function EditorProfileEdit() {
           </div>
           <div className="reels-grid grid grid-cols-2 gap-3 sm:grid-cols-3">
             {(profile.portfolio_links || []).map((link, i) => (
-              <a key={i} href={link} target="_blank" rel="noreferrer" className="reel-card group relative aspect-[9/14] overflow-hidden rounded-2xl border border-white/10 bg-brand-panel">
-                {/\.(mp4|webm|mov)(\?|$)/i.test(link) ? <video src={link} muted playsInline className="h-full w-full object-cover" /> : <img src={link} alt={`Project reel ${i + 1}`} className="h-full w-full object-cover" />}
+              <button type="button" key={i} onClick={() => setActiveReel({ link, index: i })} aria-label={`Open project reel ${i + 1}`} className="reel-card group relative aspect-[9/14] overflow-hidden rounded-2xl border border-white/10 bg-brand-panel text-left">
+                {isVideoMedia(link) ? <video src={resolveMediaUrl(link)} muted playsInline preload="metadata" className="h-full w-full object-cover" /> : <img src={resolveMediaUrl(link)} alt={`Project reel ${i + 1}`} className="h-full w-full object-cover" />}
                 <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/10" />
                 <span className="absolute left-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-black/30 text-white backdrop-blur-md"><Play size={14} fill="currentColor" /></span>
                 <span className="absolute bottom-3 left-3 text-xs font-semibold text-white">Reel {String(i + 1).padStart(2, "0")}</span>
-              </a>
+              </button>
             ))}
             <label className="group flex aspect-[9/14] cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-cyan-300/25 bg-cyan-300/[.035] text-center transition hover:border-cyan-300/55 hover:bg-cyan-300/[.07]">
               <span className="grid h-11 w-11 place-items-center rounded-full bg-gradient-to-br from-cyan-400 to-violet-600 text-white shadow-lg"><Plus size={21} /></span>
@@ -207,6 +210,7 @@ export default function EditorProfileEdit() {
         </div>
         </div>
       </section>
+      <MediaViewer item={activeReel?.link} title={activeReel ? `Project reel ${activeReel.index + 1}` : "Project reel"} onClose={() => setActiveReel(null)} />
     </div>
   );
 }

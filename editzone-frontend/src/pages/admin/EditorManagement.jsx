@@ -22,7 +22,7 @@ export default function EditorManagement() {
               <h3 className="font-semibold text-white">{e.category}</h3>
               <p className="text-xs text-gray-500 mb-2">{e.location || "No location set"}</p>
               <div className="flex items-center justify-between text-sm">
-                <Badge tone="purple">${e.hourly_rate}/hr</Badge>
+                <Badge tone="purple">Rs. {Number(e.hourly_rate || 0).toLocaleString("en-LK")}/hr</Badge>
                 <span className="text-yellow-400 text-xs">★ {e.rating_avg} ({e.rating_count})</span>
               </div>
               <p className="text-xs text-gray-500 mt-2">{e.total_views} profile views</p>
