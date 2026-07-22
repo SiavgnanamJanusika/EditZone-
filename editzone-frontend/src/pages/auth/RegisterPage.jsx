@@ -67,10 +67,10 @@ export default function RegisterPage() {
           </p>
 
           <form onSubmit={onSubmit} className="space-y-4">
-            {mode === "register" && <Input name="username" placeholder="Username" value={form.username} onChange={onChange} required />}
+            {mode === "register" && <Input name="username" placeholder="Username" value={form.username} onChange={onChange} required minLength={2} maxLength={50} />}
             <Input name="email" type="email" placeholder="Email Address" value={form.email} onChange={onChange} required />
-            <Input name="password" type="password" placeholder="Password (min 8 characters)" value={form.password} onChange={onChange} required minLength={8} />
-            <Input name="nic" placeholder="NIC Number (e.g. 200012345678 or 991234567V)" value={form.nic} onChange={onChange} required />
+            <Input name="password" type="password" placeholder="Password (8+ characters, letter and number)" value={form.password} onChange={onChange} required minLength={8} maxLength={128} pattern="(?=.*[A-Za-z])(?=.*\d).{8,128}" title="Use 8–128 characters with at least one letter and one number" />
+            <Input name="nic" placeholder="NIC Number (e.g. 200012345678 or 991234567V)" value={form.nic} onChange={onChange} required pattern="(?:[0-9]{12}|[0-9]{9}[VvXx])" title="Enter a valid 12-digit or old-format Sri Lankan NIC" />
 
             <ErrorText>{error}</ErrorText>
 

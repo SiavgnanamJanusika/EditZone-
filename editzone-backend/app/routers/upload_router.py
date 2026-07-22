@@ -11,6 +11,14 @@ from app.core.validators import get_file_category
 
 router = APIRouter(prefix="/api/v1/uploads", tags=["Uploads"])
 
+ALLOWED_MIME_PREFIXES = {
+    "image": ("image/",),
+    "video": ("video/",),
+    "document": ("application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument", "text/plain"),
+    "archive": ("application/zip", "application/x-rar", "application/vnd.rar", "application/x-7z-compressed"),
+    "audio": ("audio/",),
+}
+
 
 def _s3_client():
     kwargs = {"region_name": settings.AWS_REGION}
@@ -24,16 +32,22 @@ def _s3_client():
 
 @router.post("")
 async def upload_file(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
-    category = get_file_category(file.filename)
+    filename = file.filename or ""
+    category = get_file_category(filename)
     if not category:
         raise HTTPException(status_code=400, detail="Unsupported file type")
+    content_type = (file.content_type or "").lower()
+    if content_type and not any(content_type.startswith(prefix) for prefix in ALLOWED_MIME_PREFIXES[category]):
+        raise HTTPException(status_code=400, detail="File content type does not match its extension")
 
     contents = await file.read()
+    if not contents:
+        raise HTTPException(status_code=400, detail="File cannot be empty")
     size_mb = len(contents) / (1024 * 1024)
     if size_mb > settings.MAX_UPLOAD_MB:
         raise HTTPException(status_code=400, detail=f"File exceeds {settings.MAX_UPLOAD_MB}MB limit")
 
-    ext = file.filename.rsplit(".", 1)[-1].lower()
+    ext = filename.rsplit(".", 1)[-1].lower()
     unique_name = f"{uuid.uuid4().hex}.{ext}"
 
     if settings.AWS_S3_BUCKET:
@@ -44,7 +58,7 @@ async def upload_file(file: UploadFile = File(...), current_user: dict = Depends
                 Bucket=settings.AWS_S3_BUCKET,
                 Key=key,
                 Body=contents,
-                ContentType=file.content_type or "application/octet-stream",
+                ContentType=content_type or "application/octet-stream",
             )
         except Exception as exc:
             raise HTTPException(status_code=502, detail="AWS S3 upload failed") from exc
@@ -66,7 +80,7 @@ async def upload_file(file: UploadFile = File(...), current_user: dict = Depends
     return {
         "file_url": file_url,
         "file_type": category,
-        "original_name": file.filename,
+        "original_name": filename,
         "size_mb": round(size_mb, 2),
         "storage": storage,
     }

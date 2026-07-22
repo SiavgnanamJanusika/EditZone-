@@ -78,8 +78,8 @@ export default function PaymentPage() {
 
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <Input name="project_name" placeholder="Project Name" value={form.project_name} onChange={onChange} required />
-              <Input name="editor_name" placeholder="Editor Name" value={form.editor_name} onChange={onChange} required />
+              <Input name="project_name" placeholder="Project Name" value={form.project_name} onChange={onChange} required minLength={3} maxLength={120} />
+              <Input name="editor_name" placeholder="Editor Name" value={form.editor_name} onChange={onChange} required minLength={2} maxLength={50} />
             </div>
             <textarea
               name="project_description"
@@ -88,6 +88,8 @@ export default function PaymentPage() {
               value={form.project_description}
               onChange={onChange}
               required
+              minLength={20}
+              maxLength={5000}
               className="w-full px-4 py-2.5 rounded-lg bg-brand-panel border border-brand-border text-white focus:outline-none focus:border-brand-blue"
             />
             <div className="grid grid-cols-2 gap-4">
@@ -97,10 +99,10 @@ export default function PaymentPage() {
               </div>
               <div>
                 <label className="text-xs text-gray-400">Delivery Date</label>
-                <Input name="delivery_date" type="date" value={form.delivery_date} onChange={onChange} required />
+                <Input name="delivery_date" type="date" min={form.order_date} value={form.delivery_date} onChange={onChange} required />
               </div>
             </div>
-            <Input name="amount" type="number" min="1" step="0.01" placeholder="Project Amount (LKR)" value={form.amount} onChange={onChange} required />
+            <Input name="amount" type="number" min="1" max="10000000" step="0.01" placeholder="Project Amount (LKR)" value={form.amount} onChange={onChange} required />
 
             <div className="rounded-xl border border-brand-purple/30 bg-brand-purple/10 p-4 text-sm">
               <div className="flex justify-between text-gray-300">
@@ -132,11 +134,11 @@ export default function PaymentPage() {
               </div>
             </div>
 
-            <Input name="card_number" placeholder="Card Number" value={form.card_number} onChange={onChange} required maxLength={19} />
-            <Input name="card_holder_name" placeholder="Card Holder Name" value={form.card_holder_name} onChange={onChange} required />
+            <Input name="card_number" inputMode="numeric" placeholder="Card Number" value={form.card_number} onChange={onChange} required minLength={13} maxLength={19} pattern="[0-9 ]{13,19}" />
+            <Input name="card_holder_name" placeholder="Card Holder Name" value={form.card_holder_name} onChange={onChange} required minLength={2} maxLength={100} pattern="[A-Za-z][A-Za-z .'-]*" />
             <div className="grid grid-cols-2 gap-4">
-              <Input name="expiry_date" placeholder="MM/YY" value={form.expiry_date} onChange={onChange} required />
-              <Input name="cvv" placeholder="CVV" value={form.cvv} onChange={onChange} required maxLength={4} />
+              <Input name="expiry_date" inputMode="numeric" placeholder="MM/YY" value={form.expiry_date} onChange={onChange} required pattern="(?:0[1-9]|1[0-2])/[0-9]{2}" maxLength={5} />
+              <Input name="cvv" type="password" inputMode="numeric" placeholder="CVV" value={form.cvv} onChange={onChange} required minLength={3} maxLength={4} pattern="[0-9]{3,4}" />
             </div>
 
             <ErrorText>{error}</ErrorText>

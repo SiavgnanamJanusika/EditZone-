@@ -117,6 +117,8 @@ export default function EditorProfilePage() {
             <form onSubmit={submitRequest} className="space-y-3">
               <input
                 required
+                minLength={3}
+                maxLength={120}
                 placeholder="Project Title"
                 value={form.project_title}
                 onChange={(e) => setForm({ ...form, project_title: e.target.value })}
@@ -124,6 +126,8 @@ export default function EditorProfilePage() {
               />
               <textarea
                 required
+                minLength={20}
+                maxLength={5000}
                 rows={4}
                 placeholder="Describe your project..."
                 value={form.project_description}

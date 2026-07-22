@@ -5,6 +5,7 @@ from app.db.mongodb import requests_col, editors_col, users_col, notifications_c
 from app.schemas.schemas import CreateRequestBody, RequestActionBody
 from app.core.security import get_current_user, require_user, require_editor
 from app.core.utils import serialize_doc, serialize_list, oid, now_utc
+from app.core.validators import is_valid_upload_url
 from app.sockets.socket_manager import sio
 
 router = APIRouter(prefix="/api/v1/requests", tags=["Requests"])
@@ -105,6 +106,8 @@ async def deliver_video(request_id: str, file_url: str, current_user: dict = Dep
         raise HTTPException(status_code=404, detail="Request not found")
     if doc["editor_user_id"] != current_user["_id"]:
         raise HTTPException(status_code=403, detail="Not your request")
+    if not is_valid_upload_url(file_url):
+        raise HTTPException(status_code=400, detail="Final delivery must be a valid uploaded file")
     # Retrying an upload request after the first submission must be idempotent. This can
     # happen when a client loses the response after the database update has succeeded.
     if doc["status"] == "delivered":

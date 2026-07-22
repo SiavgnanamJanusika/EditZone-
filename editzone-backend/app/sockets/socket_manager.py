@@ -1,4 +1,5 @@
 import socketio
+from urllib.parse import urlparse
 from bson import ObjectId
 from app.config import settings
 from app.core.security import decode_token
@@ -77,17 +78,26 @@ async def send_message(sid, data):
 
     text = (data.get("text") or "").strip()
     file_url = data.get("file_url")
+    file_type = data.get("file_type")
     if not text and not file_url:
         return {"success": False, "message": "Message cannot be empty"}
     if len(text) > 5000:
         return {"success": False, "message": "Message is too long"}
+    if file_url:
+        if not isinstance(file_url, str) or len(file_url) > 2048:
+            return {"success": False, "message": "Invalid attachment URL"}
+        parsed = urlparse(file_url)
+        if not (file_url.startswith("/api/v1/uploads/file/") or parsed.scheme in ("http", "https")):
+            return {"success": False, "message": "Invalid attachment URL"}
+        if file_type not in ("image", "video", "document", "archive", "audio"):
+            return {"success": False, "message": "Invalid attachment type"}
 
     doc = {
         "request_id": request_id,
         "sender_id": user_id,
         "text": text or None,
         "file_url": file_url,
-        "file_type": data.get("file_type"),
+        "file_type": file_type,
         "created_at": now_utc(),
     }
     result = await messages_col.insert_one(doc)
