@@ -146,11 +146,12 @@ export default function EditorProfileEdit() {
               </select>
             </div>
 
-            <Input placeholder="Location" value={profile.location || ""} onChange={(e) => setProfile({ ...profile, location: e.target.value })} />
-            <Input type="number" placeholder="Hourly Rate (USD)" value={profile.hourly_rate || ""} onChange={(e) => setProfile({ ...profile, hourly_rate: e.target.value })} />
+            <Input placeholder="Location" maxLength={100} value={profile.location || ""} onChange={(e) => setProfile({ ...profile, location: e.target.value })} />
+            <Input type="number" min="0" max="1000000" step="0.01" placeholder="Hourly Rate (USD)" value={profile.hourly_rate || ""} onChange={(e) => setProfile({ ...profile, hourly_rate: e.target.value })} />
 
             <textarea
               rows={4}
+              maxLength={1000}
               placeholder="Bio - tell clients about your experience..."
               value={profile.bio || ""}
               onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
@@ -160,7 +161,7 @@ export default function EditorProfileEdit() {
             <div>
               <label className="text-xs text-gray-400 mb-1 block">Skills</label>
               <div className="flex gap-2 mb-2">
-                <Input placeholder="Add a skill (e.g. Premiere Pro)" value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill())} />
+                <Input placeholder="Add a skill (e.g. Premiere Pro)" maxLength={50} value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill())} />
                 <button type="button" onClick={addSkill} className="px-4 rounded-lg border border-brand-border text-brand-cyan hover:border-brand-blue">Add</button>
               </div>
               <div className="flex flex-wrap gap-2">

@@ -2,10 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from bson import ObjectId
 from typing import Optional
 import re
+from urllib.parse import urlparse
 
 from app.db.mongodb import editors_col, users_col
 from app.schemas.schemas import EditorProfileUpdate
 from app.core.security import get_current_user, require_editor
+from app.core.validators import get_file_category, is_valid_upload_url
 from app.core.utils import serialize_doc, serialize_list, oid
 
 router = APIRouter(prefix="/api/v1/editors", tags=["Editors"])
@@ -92,12 +94,21 @@ async def update_my_editor_profile(body: EditorProfileUpdate, current_user: dict
 
 @router.put("/me/profile-picture")
 async def update_profile_picture(file_url: str, current_user: dict = Depends(require_editor)):
+    if not is_valid_upload_url(file_url) or get_file_category(urlparse(file_url).path) != "image":
+        raise HTTPException(status_code=400, detail="Profile picture must be a valid uploaded image")
     await editors_col.update_one({"user_id": current_user["_id"]}, {"$set": {"profile_picture": file_url}})
     return {"message": "Profile picture updated", "profile_picture": file_url}
 
 
 @router.post("/me/portfolio")
 async def add_portfolio_item(file_url: str, current_user: dict = Depends(require_editor)):
+    if not is_valid_upload_url(file_url):
+        raise HTTPException(status_code=400, detail="Portfolio item must be a valid uploaded file")
+    profile = await editors_col.find_one({"user_id": current_user["_id"]}, {"portfolio_links": 1})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Editor profile not found")
+    if len(profile.get("portfolio_links", [])) >= 50:
+        raise HTTPException(status_code=400, detail="Portfolio is limited to 50 items")
     await editors_col.update_one(
         {"user_id": current_user["_id"]}, {"$push": {"portfolio_links": file_url}}
     )

@@ -62,9 +62,9 @@ export default function CompleteProfilePage() {
           <p className="text-gray-400 text-sm text-center mb-6">Just a few more details to get started</p>
 
           <form onSubmit={onSubmit} className="space-y-4">
-            <Input name="username" placeholder="Username" value={form.username} onChange={onChange} required />
-            <Input name="nic" placeholder="NIC Number" value={form.nic} onChange={onChange} required />
-            <Input name="phone" placeholder="Phone Number (e.g. 0771234567)" value={form.phone} onChange={onChange} required />
+            <Input name="username" placeholder="Username" value={form.username} onChange={onChange} required minLength={2} maxLength={50} />
+            <Input name="nic" placeholder="NIC Number" value={form.nic} onChange={onChange} required pattern="(?:[0-9]{12}|[0-9]{9}[VvXx])" title="Enter a valid Sri Lankan NIC" />
+            <Input name="phone" type="tel" placeholder="Phone Number (e.g. 0771234567)" value={form.phone} onChange={onChange} required pattern="(?:\+94|0)[0-9]{9}" title="Enter a valid Sri Lankan phone number" />
 
             <select
               name="district"

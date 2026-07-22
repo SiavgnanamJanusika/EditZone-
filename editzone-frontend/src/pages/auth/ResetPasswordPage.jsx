@@ -43,8 +43,8 @@ export default function ResetPasswordPage() {
           ) : (
             <form onSubmit={onSubmit} className="space-y-4">
               <Input name="email" type="email" placeholder="Email Address" value={form.email} onChange={onChange} required />
-              <Input name="otp" placeholder="6-digit OTP" value={form.otp} onChange={onChange} required maxLength={6} />
-              <Input name="new_password" type="password" placeholder="New Password (min 8 characters)" value={form.new_password} onChange={onChange} required minLength={8} />
+              <Input name="otp" inputMode="numeric" placeholder="6-digit OTP" value={form.otp} onChange={onChange} required minLength={6} maxLength={6} pattern="[0-9]{6}" />
+              <Input name="new_password" type="password" placeholder="New password (8+ characters, letter and number)" value={form.new_password} onChange={onChange} required minLength={8} maxLength={128} pattern="(?=.*[A-Za-z])(?=.*\d).{8,128}" title="Use 8–128 characters with at least one letter and one number" />
               <ErrorText>{error}</ErrorText>
               <PrimaryButton type="submit" className="w-full" disabled={loading}>
                 {loading ? "Resetting..." : "Reset Password"}
