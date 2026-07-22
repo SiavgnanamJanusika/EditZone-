@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, CheckCheck, CreditCard, FileText, Image, MoreVertical, Paperclip, Send, UploadCloud } from "lucide-react";
+import { ArrowLeft, CheckCheck, CircleCheck, Clock3, CreditCard, FileText, Image, MoreVertical, Paperclip, Send, UploadCloud } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useSocket } from "../../context/SocketContext";
 import { Loader } from "../../components/common/UI";
@@ -124,6 +124,10 @@ export default function ChatPage({ role }) {
   const deliverFinal = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
+    if (!["accepted", "in_progress"].includes(request?.status)) {
+      event.target.value = "";
+      return;
+    }
     setUploading(true);
     setError("");
     try {
@@ -144,6 +148,7 @@ export default function ChatPage({ role }) {
   if (!request) return null;
 
   const isEditor = role === "editor";
+  const canDeliver = ["accepted", "in_progress"].includes(request.status);
   const backPath = isEditor ? "/editor/dashboard" : "/editors";
   const initials = (request.project_title || "EZ").slice(0, 2).toUpperCase();
 
@@ -165,11 +170,19 @@ export default function ChatPage({ role }) {
             <button onClick={() => navigate(`/payment/${requestId}`)} className="chat-action flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold text-white sm:px-4 sm:text-sm">
               <CreditCard size={17} /><span className="hidden sm:inline">Payment</span>
             </button>
-          ) : (
+          ) : canDeliver ? (
             <label className="chat-action flex cursor-pointer items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold text-white sm:px-4 sm:text-sm">
               <UploadCloud size={17} /><span className="hidden sm:inline">{uploading ? "Uploading…" : "Final file"}</span>
               <input type="file" hidden onChange={deliverFinal} disabled={uploading} />
             </label>
+          ) : request.status === "delivered" ? (
+            <span className="flex items-center gap-2 rounded-full border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-xs font-semibold text-amber-200 sm:px-4">
+              <Clock3 size={16} /><span className="hidden sm:inline">Awaiting review</span>
+            </span>
+          ) : (
+            <span className="flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-2 text-xs font-semibold text-emerald-200 sm:px-4">
+              <CircleCheck size={16} /><span className="hidden sm:inline">Completed</span>
+            </span>
           )}
           <MoreVertical className="text-[#aebac1]" size={21} />
         </div>

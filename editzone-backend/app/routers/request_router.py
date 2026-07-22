@@ -105,8 +105,21 @@ async def deliver_video(request_id: str, file_url: str, current_user: dict = Dep
         raise HTTPException(status_code=404, detail="Request not found")
     if doc["editor_user_id"] != current_user["_id"]:
         raise HTTPException(status_code=403, detail="Not your request")
+    # Retrying an upload request after the first submission must be idempotent. This can
+    # happen when a client loses the response after the database update has succeeded.
+    if doc["status"] == "delivered":
+        return {
+            "message": "Final file was already submitted and is awaiting admin verification.",
+            "status": "delivered",
+            "delivered_file_url": doc.get("delivered_file_url"),
+        }
+    if doc["status"] == "completed":
+        raise HTTPException(status_code=409, detail="This delivery has already been approved and completed")
     if doc["status"] not in ("accepted", "in_progress"):
-        raise HTTPException(status_code=400, detail="Request not in a deliverable state")
+        raise HTTPException(
+            status_code=409,
+            detail=f"Final delivery is unavailable while the request is {doc['status'].replace('_', ' ')}",
+        )
 
     await requests_col.update_one(
         {"_id": doc["_id"]},
