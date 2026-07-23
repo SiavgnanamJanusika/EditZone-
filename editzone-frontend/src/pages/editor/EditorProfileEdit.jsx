@@ -5,10 +5,12 @@ import { Loader, Input, PrimaryButton, ErrorText } from "../../components/common
 import api from "../../services/api";
 import { isVideoMedia, resolveMediaUrl } from "../../services/media";
 import MediaViewer from "../../components/common/MediaViewer";
+import { useAuth } from "../../context/AuthContext";
 
 const CATEGORIES = ["Image Editor", "TikTok Editor", "Video Editor"];
 
 export default function EditorProfileEdit() {
+  const { refreshUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -30,6 +32,7 @@ export default function EditorProfileEdit() {
     setMessage("");
     try {
       const res = await api.put("/editors/me/profile", {
+        username: profile.username,
         bio: profile.bio,
         skills: profile.skills,
         hourly_rate: parseFloat(profile.hourly_rate) || 0,
@@ -37,6 +40,7 @@ export default function EditorProfileEdit() {
         category: profile.category,
       });
       setProfile((p) => ({ ...p, ...res.data }));
+      await refreshUser();
       setMessage("Profile updated successfully!");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update profile");
@@ -138,6 +142,18 @@ export default function EditorProfileEdit() {
             <h2 className="mt-1 text-lg font-semibold text-white">Business information</h2>
           </div>
           <form onSubmit={save} className="space-y-4">
+            <div>
+              <label className="text-xs text-gray-400 mb-1 block">Profile name</label>
+              <Input
+                placeholder="Profile name"
+                minLength={2}
+                maxLength={50}
+                required
+                value={profile.username || ""}
+                onChange={(e) => setProfile({ ...profile, username: e.target.value })}
+              />
+            </div>
+
             <div>
               <label className="text-xs text-gray-400 mb-1 block">Category</label>
               <select

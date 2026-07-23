@@ -31,7 +31,7 @@ ALLOWED_FILE_EXTENSIONS = {
     "video": {".mp4", ".mov", ".avi", ".mkv", ".webm"},
     "document": {".pdf", ".doc", ".docx", ".txt"},
     "archive": {".zip", ".rar", ".7z"},
-    "audio": {".mp3", ".wav", ".m4a", ".ogg"},
+    "audio": {".mp3", ".wav", ".m4a", ".ogg", ".weba"},
 }
 
 

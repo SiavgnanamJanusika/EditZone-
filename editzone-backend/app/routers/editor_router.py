@@ -82,12 +82,20 @@ async def get_my_editor_profile(current_user: dict = Depends(require_editor)):
 
 @router.put("/me/profile")
 async def update_my_editor_profile(body: EditorProfileUpdate, current_user: dict = Depends(require_editor)):
-    update_data = {k: v for k, v in body.model_dump().items() if v is not None}
-    if not update_data:
+    submitted_data = {k: v for k, v in body.model_dump().items() if v is not None}
+    if not submitted_data:
         raise HTTPException(status_code=400, detail="No fields to update")
-    result = await editors_col.update_one({"user_id": current_user["_id"]}, {"$set": update_data})
-    if result.matched_count == 0:
+
+    editor = await editors_col.find_one({"user_id": current_user["_id"]})
+    if not editor:
         raise HTTPException(status_code=404, detail="Editor profile not found")
+
+    username = submitted_data.pop("username", None)
+    if submitted_data:
+        await editors_col.update_one({"_id": editor["_id"]}, {"$set": submitted_data})
+    if username is not None:
+        await users_col.update_one({"_id": current_user["_id"]}, {"$set": {"username": username}})
+
     editor = await editors_col.find_one({"user_id": current_user["_id"]})
     return await _attach_user_info(editor)
 

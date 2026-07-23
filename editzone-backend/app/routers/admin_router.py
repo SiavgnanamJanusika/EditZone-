@@ -18,7 +18,20 @@ async def list_users(current_user: dict = Depends(require_admin)):
 @router.get("/editors")
 async def list_all_editors(current_user: dict = Depends(require_admin)):
     docs = await editors_col.find({}).to_list(500)
-    return {"editors": serialize_list(docs)}
+    user_ids = [doc.get("user_id") for doc in docs if doc.get("user_id")]
+    users = await users_col.find({"_id": {"$in": user_ids}}, {"username": 1, "email": 1, "is_banned": 1}).to_list(500)
+    users_by_id = {user["_id"]: user for user in users}
+    results = []
+    for doc in docs:
+        item = serialize_doc(doc)
+        user = users_by_id.get(doc.get("user_id"), {})
+        item.update({
+            "username": user.get("username", "Unknown editor"),
+            "email": user.get("email", ""),
+            "is_banned": user.get("is_banned", False),
+        })
+        results.append(item)
+    return {"editors": results}
 
 
 @router.patch("/users/{user_id}/ban")
@@ -58,7 +71,22 @@ async def release_admin_fee(payment_id: str, current_user: dict = Depends(requir
 @router.get("/projects")
 async def monitor_projects(current_user: dict = Depends(require_admin)):
     docs = await requests_col.find({}).sort("created_at", -1).to_list(500)
-    return {"projects": serialize_list(docs)}
+    user_ids = list({uid for doc in docs for uid in (doc.get("user_id"), doc.get("editor_user_id")) if uid})
+    users = await users_col.find({"_id": {"$in": user_ids}}, {"username": 1, "email": 1}).to_list(1000)
+    users_by_id = {user["_id"]: user for user in users}
+    results = []
+    for doc in docs:
+        item = serialize_doc(doc)
+        client = users_by_id.get(doc.get("user_id"), {})
+        editor = users_by_id.get(doc.get("editor_user_id"), {})
+        item.update({
+            "client_name": client.get("username", "Unknown client"),
+            "client_email": client.get("email", ""),
+            "editor_name": editor.get("username", "Unknown editor"),
+            "editor_email": editor.get("email", ""),
+        })
+        results.append(item)
+    return {"projects": results}
 
 
 @router.get("/projects/pending-verification")

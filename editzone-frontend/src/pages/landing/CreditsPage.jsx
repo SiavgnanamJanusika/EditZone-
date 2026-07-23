@@ -17,7 +17,7 @@ export default function CreditsPage() {
           <p className="mb-3 text-xs font-bold uppercase tracking-[0.34em] text-cyan-300">The people behind the pixels</p>
           <h1 className="font-display text-4xl font-black text-white sm:text-6xl">Full Credits</h1>
           <p className="mx-auto mt-6 max-w-xl text-base leading-7 text-slate-300">
-            Designed and crafted with care by <span className="font-semibold text-white">Linochu</span> for the editors, creators, and stories that make every frame matter.
+            Designed and crafted with care by <span className="font-semibold text-white">Janusika </span> for the editors, creators, and stories that make every frame matter.
           </p>
           <div className="mt-10 grid gap-3 sm:grid-cols-3">
             {[{ icon: Code2, label: "Product & Build" }, { icon: Clapperboard, label: "Creative Direction" }, { icon: Heart, label: "Made with care" }].map(({ icon: Icon, label }, index) => (
@@ -26,7 +26,7 @@ export default function CreditsPage() {
               </div>
             ))}
           </div>
-          <p className="mt-10 text-xs uppercase tracking-[0.24em] text-slate-500">© January 2026 · Linochu</p>
+          <p className="mt-10 text-xs uppercase tracking-[0.24em] text-slate-500">© August 2026 UKI Kilinochchi</p>
           <Link to="/" className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-cyan-300 hover:text-white"><ArrowLeft size={16} /> Back home</Link>
         </section>
       </main>

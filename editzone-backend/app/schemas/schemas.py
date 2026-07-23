@@ -10,6 +10,7 @@ class ValidatedModel(BaseModel):
 
 
 class EditorProfileUpdate(ValidatedModel):
+    username: Optional[str] = Field(default=None, min_length=2, max_length=50)
     bio: Optional[str] = Field(default=None, max_length=1000)
     skills: Optional[List[str]] = Field(default=None, max_length=20)
     hourly_rate: Optional[float] = Field(default=None, ge=0, le=1_000_000)

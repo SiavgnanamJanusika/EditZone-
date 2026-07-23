@@ -15,13 +15,13 @@ export default function WhyUsPage() {
   return (
     <div className="min-h-screen bg-brand-dark">
       <LandingNavbar />
-      <section className="max-w-6xl mx-auto px-6 py-16">
+      <section className="marketing-page-enter max-w-6xl mx-auto px-6 py-16">
         <h1 className="font-display text-4xl font-bold mb-4 text-center">Why Choose EditZone</h1>
         <p className="text-gray-400 text-center mb-14 max-w-2xl mx-auto">
           We built EditZone to make hiring a video editor as safe and simple as it should be.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="marketing-card-list grid grid-cols-1 md:grid-cols-3 gap-6">
           {reasons.map(({ icon: Icon, title, desc }) => (
             <div key={title} className="glass rounded-xl p-6 hover:shadow-glow-blue transition-all">
               <div className="w-11 h-11 rounded-lg bg-brand-gradient flex items-center justify-center mb-4">

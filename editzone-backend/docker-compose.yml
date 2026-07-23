@@ -16,9 +16,6 @@ services:
       - mongo
     ports:
       - "8000:8000"
-    environment:
-      - MONGO_URI=mongodb://mongo:27017
-      - MONGO_DB_NAME=editzone
     env_file:
       - .env
     volumes:

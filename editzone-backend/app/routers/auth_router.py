@@ -93,6 +93,8 @@ async def login(body: LoginRequest):
     })
     if not user or not verify_password(body.password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid email or password")
+    if user.get("role") != "admin" and not nic:
+        raise HTTPException(status_code=401, detail="NIC is required for client and editor accounts")
     if nic and user.get("nic") and nic != user.get("nic", "").strip().upper():
         raise HTTPException(status_code=401, detail="NIC does not match our records")
     if user.get("is_banned"):

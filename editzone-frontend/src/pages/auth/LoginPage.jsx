@@ -49,14 +49,14 @@ export default function LoginPage() {
       <LandingNavbar />
       <section className="max-w-md mx-auto px-6 py-16">
         <div className="flex justify-center mb-6"><Logo size={60} /></div>
-        <div className="glass rounded-2xl p-8">
+        <div className="auth-glow-card glass rounded-2xl p-8">
           <h1 className="font-display text-2xl font-bold mb-1 text-center">Welcome Back</h1>
           <p className="text-gray-400 text-sm text-center mb-6">Log in to your EditZone account</p>
 
           <form onSubmit={onSubmit} className="space-y-4">
             <Input name="email" type="email" placeholder="Email Address" value={form.email} onChange={onChange} required />
             <Input name="password" type="password" placeholder="Password" value={form.password} onChange={onChange} required />
-            <Input name="nic" placeholder="NIC Number" value={form.nic} onChange={onChange} required />
+            <Input name="nic" placeholder="NIC Number (not required for admin)" value={form.nic} onChange={onChange} />
 
             <div className="text-right">
               <Link to="/forgot-password" className="text-sm text-brand-cyan hover:underline">Forgot Password?</Link>
