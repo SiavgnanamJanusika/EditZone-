@@ -34,16 +34,16 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-brand-dark">
       <LandingNavbar />
-      <section className="max-w-4xl mx-auto px-6 py-16">
+      <section className="marketing-page-enter max-w-4xl mx-auto px-6 py-16">
         <h1 className="font-display text-4xl font-bold mb-4 text-center">How EditZone Works</h1>
         <p className="text-gray-400 text-center mb-14 max-w-2xl mx-auto">
           A secure, end-to-end marketplace connecting clients with professional video editors —
           from discovery to delivery to payment.
         </p>
 
-        <div className="space-y-8">
+        <div className="marketing-card-list space-y-8">
           {steps.map(({ icon: Icon, title, desc }, i) => (
-            <div key={title} className="flex gap-5 glass rounded-xl p-6">
+            <div key={title} className="flex gap-5 glass rounded-xl p-6 transition-all duration-300 hover:-translate-y-1 hover:border-brand-blue/50 hover:shadow-glow-blue">
               <div className="w-12 h-12 rounded-full bg-brand-gradient flex items-center justify-center shrink-0">
                 <Icon size={22} className="text-white" />
               </div>
@@ -56,7 +56,7 @@ export default function AboutPage() {
           ))}
         </div>
 
-        <div className="glass rounded-xl p-8 mt-14">
+        <div className="marketing-closing-card glass rounded-xl p-8 mt-14 transition-all duration-300 hover:-translate-y-1 hover:border-brand-blue/50 hover:shadow-glow-blue">
           <h2 className="font-display text-xl font-bold mb-3">Secure Communication & Payments</h2>
           <p className="text-gray-400 text-sm leading-relaxed">
             All messaging happens on-platform through encrypted, real-time chat — no need to share

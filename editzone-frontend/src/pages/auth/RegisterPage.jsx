@@ -58,7 +58,7 @@ export default function RegisterPage() {
       <LandingNavbar />
       <section className="max-w-md mx-auto px-6 py-16">
         <div className="flex justify-center mb-6"><Logo size={60} /></div>
-        <div className="glass rounded-2xl p-8">
+        <div className="auth-glow-card glass rounded-2xl p-8">
           <h1 className="font-display text-2xl font-bold mb-1 text-center">
             {mode === "signin" ? "Sign In" : `Register as ${role === "editor" ? "an Editor" : "a Client"}`}
           </h1>

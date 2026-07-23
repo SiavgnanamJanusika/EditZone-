@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { useAuth } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
@@ -42,55 +42,58 @@ function RequireLoggedIn({ children }) {
   return children;
 }
 
+function AnimatedRoutes() {
+  const location = useLocation();
+
+  return (
+    <div key={location.pathname} className="page-route-enter">
+      <Routes location={location}>
+        {/* Public */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/why-us" element={<WhyUsPage />} />
+        <Route path="/credits" element={<CreditsPage />} />
+        <Route path="/choose-role" element={<ChooseRolePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+        {/* Post-login, pre-registration-complete */}
+        <Route path="/complete-profile" element={<RequireLoggedIn><CompleteProfilePage /></RequireLoggedIn>} />
+
+        {/* User */}
+        <Route path="/editors" element={<ProtectedRoute><RoleBasedRoute roles={["user"]}><EditorsPage /></RoleBasedRoute></ProtectedRoute>} />
+        <Route path="/editors/:editorId" element={<ProtectedRoute><RoleBasedRoute roles={["user"]}><EditorProfilePage /></RoleBasedRoute></ProtectedRoute>} />
+        <Route path="/order-history" element={<ProtectedRoute><RoleBasedRoute roles={["user"]}><OrderHistoryPage /></RoleBasedRoute></ProtectedRoute>} />
+        <Route path="/chat/:requestId" element={<ProtectedRoute><RoleBasedRoute roles={["user"]}><ChatPage role="user" /></RoleBasedRoute></ProtectedRoute>} />
+        <Route path="/payment/:requestId" element={<ProtectedRoute><RoleBasedRoute roles={["user"]}><PaymentPage /></RoleBasedRoute></ProtectedRoute>} />
+        <Route path="/payment-success" element={<ProtectedRoute><RoleBasedRoute roles={["user"]}><PaymentSuccessPage /></RoleBasedRoute></ProtectedRoute>} />
+
+        {/* Editor */}
+        <Route path="/editor/dashboard" element={<ProtectedRoute><RoleBasedRoute roles={["editor"]}><EditorDashboard /></RoleBasedRoute></ProtectedRoute>} />
+        <Route path="/editor/profile" element={<ProtectedRoute><RoleBasedRoute roles={["editor"]}><EditorProfileEdit /></RoleBasedRoute></ProtectedRoute>} />
+        <Route path="/editor/chat/:requestId" element={<ProtectedRoute><RoleBasedRoute roles={["editor"]}><ChatPage role="editor" /></RoleBasedRoute></ProtectedRoute>} />
+
+        {/* Admin */}
+        <Route path="/admin" element={<ProtectedRoute><RoleBasedRoute roles={["admin"]}><AdminDashboard /></RoleBasedRoute></ProtectedRoute>} />
+        <Route path="/admin/users" element={<ProtectedRoute><RoleBasedRoute roles={["admin"]}><UserManagement /></RoleBasedRoute></ProtectedRoute>} />
+        <Route path="/admin/editors" element={<ProtectedRoute><RoleBasedRoute roles={["admin"]}><EditorManagement /></RoleBasedRoute></ProtectedRoute>} />
+        <Route path="/admin/payments" element={<ProtectedRoute><RoleBasedRoute roles={["admin"]}><PaymentManagement /></RoleBasedRoute></ProtectedRoute>} />
+        <Route path="/admin/projects" element={<ProtectedRoute><RoleBasedRoute roles={["admin"]}><ProjectMonitoring /></RoleBasedRoute></ProtectedRoute>} />
+
+        <Route path="*" element={<LandingPage />} />
+      </Routes>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <SocketProvider>
-          <Routes>
-            {/* Public */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/why-us" element={<WhyUsPage />} />
-            <Route path="/credits" element={<CreditsPage />} />
-            <Route path="/choose-role" element={<ChooseRolePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
-
-            {/* Post-login, pre-registration-complete */}
-            <Route
-              path="/complete-profile"
-              element={
-                <RequireLoggedIn>
-                  <CompleteProfilePage />
-                </RequireLoggedIn>
-              }
-            />
-
-            {/* User */}
-            <Route path="/editors" element={<ProtectedRoute><RoleBasedRoute roles={["user"]}><EditorsPage /></RoleBasedRoute></ProtectedRoute>} />
-            <Route path="/editors/:editorId" element={<ProtectedRoute><RoleBasedRoute roles={["user"]}><EditorProfilePage /></RoleBasedRoute></ProtectedRoute>} />
-            <Route path="/order-history" element={<ProtectedRoute><RoleBasedRoute roles={["user"]}><OrderHistoryPage /></RoleBasedRoute></ProtectedRoute>} />
-            <Route path="/chat/:requestId" element={<ProtectedRoute><RoleBasedRoute roles={["user"]}><ChatPage role="user" /></RoleBasedRoute></ProtectedRoute>} />
-            <Route path="/payment/:requestId" element={<ProtectedRoute><RoleBasedRoute roles={["user"]}><PaymentPage /></RoleBasedRoute></ProtectedRoute>} />
-            <Route path="/payment-success" element={<ProtectedRoute><RoleBasedRoute roles={["user"]}><PaymentSuccessPage /></RoleBasedRoute></ProtectedRoute>} />
-
-            {/* Editor */}
-            <Route path="/editor/dashboard" element={<ProtectedRoute><RoleBasedRoute roles={["editor"]}><EditorDashboard /></RoleBasedRoute></ProtectedRoute>} />
-            <Route path="/editor/profile" element={<ProtectedRoute><RoleBasedRoute roles={["editor"]}><EditorProfileEdit /></RoleBasedRoute></ProtectedRoute>} />
-            <Route path="/editor/chat/:requestId" element={<ProtectedRoute><RoleBasedRoute roles={["editor"]}><ChatPage role="editor" /></RoleBasedRoute></ProtectedRoute>} />
-
-            {/* Admin */}
-            <Route path="/admin" element={<ProtectedRoute><RoleBasedRoute roles={["admin"]}><AdminDashboard /></RoleBasedRoute></ProtectedRoute>} />
-            <Route path="/admin/users" element={<ProtectedRoute><RoleBasedRoute roles={["admin"]}><UserManagement /></RoleBasedRoute></ProtectedRoute>} />
-            <Route path="/admin/editors" element={<ProtectedRoute><RoleBasedRoute roles={["admin"]}><EditorManagement /></RoleBasedRoute></ProtectedRoute>} />
-            <Route path="/admin/payments" element={<ProtectedRoute><RoleBasedRoute roles={["admin"]}><PaymentManagement /></RoleBasedRoute></ProtectedRoute>} />
-            <Route path="/admin/projects" element={<ProtectedRoute><RoleBasedRoute roles={["admin"]}><ProjectMonitoring /></RoleBasedRoute></ProtectedRoute>} />
-
-            <Route path="*" element={<LandingPage />} />
-          </Routes>
+          <AnimatedRoutes />
         </SocketProvider>
       </AuthProvider>
     </BrowserRouter>

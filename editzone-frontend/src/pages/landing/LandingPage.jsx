@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ShieldCheck, Zap, Wallet, Star } from "lucide-react";
+import { ShieldCheck, Zap, Wallet, Star, Camera, Play, Share2 } from "lucide-react";
 import LandingNavbar from "../../components/navbar/LandingNavbar";
 import { PrimaryButton, OutlineButton } from "../../components/common/UI";
 import Footer from "../../components/common/Footer";
@@ -11,38 +11,49 @@ export default function LandingPage() {
     <div className="min-h-screen bg-brand-dark">
       <LandingNavbar />
 
-      <section className="landing-hero max-w-[1440px] mx-auto px-6 sm:px-10 py-12 lg:py-16 grid lg:grid-cols-[1.15fr_0.85fr] items-center gap-10 lg:gap-16">
-        <div className="text-center lg:text-left">
-          <span className="text-pill mb-6 inline-flex">Professional editing, simplified</span>
-          <h1 className="hero-title font-display font-black leading-[1.08] mb-6">
-            Hire Professional{" "}
-            <span className="bg-gradient-to-r from-brand-purple via-brand-cyan to-brand-blue bg-clip-text text-transparent">
-              Video Editors
-            </span>{" "}
-            in Minutes
-          </h1>
-          <p className="text-gray-400 text-base sm:text-lg lg:text-xl max-w-2xl mx-auto lg:mx-0 mb-9 leading-relaxed">
-            EditZone connects you with verified, skilled video editors for TikTok, YouTube, and every
-            format in between — with secure escrow payments and real-time collaboration built in.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <PrimaryButton onClick={() => navigate("/choose-role")} className="rounded-full text-base sm:text-lg px-8 py-3.5">
-              Get Started
-            </PrimaryButton>
-            <OutlineButton onClick={() => navigate("/why-us")} className="rounded-full text-base sm:text-lg px-8 py-3.5">
-              Why EditZone?
-            </OutlineButton>
+      <section className="mx-auto max-w-[1440px] px-4 py-6 sm:px-8 sm:py-9">
+        <div className="editorial-hero">
+          <div className="editorial-hero-shade" />
+          <div className="editorial-art" aria-hidden="true">
+            <div className="editorial-art-glow" />
+            <div className="editorial-screen">
+              <div className="editorial-screen-bar"><span /><span /><span /></div>
+              <div className="editorial-preview"><img src="/favicon.png" alt="" /></div>
+              <div className="editorial-timeline">
+                <span className="track track-one" /><span className="track track-two" /><span className="track track-three" />
+                <i />
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="hero-visual flex justify-center">
-          <div className="favicon-draw-wrap" aria-label="EditZone">
-            <img src="/favicon.png" alt="EditZone" className="favicon-draw-image" />
-            <span className="favicon-draw-line" aria-hidden="true" />
+          <div className="relative z-10 flex h-full min-h-[620px] items-end px-7 py-12 sm:px-12 lg:min-h-[700px] lg:px-16 lg:py-16">
+            <div className="editorial-copy max-w-3xl pb-5">
+              <span className="mb-5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.22em] text-cyan-200"><span className="h-px w-9 bg-cyan-300" /> Professional editing, simplified</span>
+              <h1 className="editorial-title text-white">
+                <span className="editorial-title-line">Hire Professional</span>
+                <span className="editorial-title-accent">Video Editors</span>
+                <span className="editorial-title-line editorial-title-end">in Minutes</span>
+              </h1>
+              <p className="mt-7 max-w-xl text-sm leading-7 text-white/75 sm:text-base">
+                EditZone connects you with verified, skilled video editors for TikTok, YouTube, and every format in between — with secure escrow payments and real-time collaboration built in.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <PrimaryButton onClick={() => navigate("/choose-role")} className="rounded-full px-7 py-3">Get Started</PrimaryButton>
+                <OutlineButton onClick={() => navigate("/why-us")} className="rounded-full border-white/40 bg-black/10 px-7 py-3 text-white hover:bg-white/10">Why EditZone?</OutlineButton>
+              </div>
+            </div>
           </div>
+          <aside className="editorial-social-rail" aria-label="Social links">
+            <span className="editorial-rail-line" />
+            <a href="#features" aria-label="Creator gallery"><Camera size={17} /></a>
+            <a href="#features" aria-label="Video showcase"><Play size={18} fill="currentColor" /></a>
+            <a href="#features" aria-label="Share"><Share2 size={17} /></a>
+            <span className="editorial-rail-line" />
+          </aside>
+          <div className="editorial-page-mark" aria-hidden="true"><span className="active" /><span /><span /></div>
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-6 pb-24 grid grid-cols-1 md:grid-cols-4 gap-6">
+      <section id="features" className="max-w-6xl mx-auto px-6 pb-24 pt-10 grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
           { icon: ShieldCheck, title: "Verified Editors", desc: "Every editor is vetted for skill and reliability." },
           { icon: Wallet, title: "Escrow Payments", desc: "Your funds stay protected until you approve delivery." },

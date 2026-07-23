@@ -118,3 +118,37 @@ async def typing(sid, data):
             room=f"chat_{request_id}",
             skip_sid=sid,
         )
+
+
+async def _relay_call_event(sid, data, event):
+    request_id = data.get("request_id")
+    if not await _can_access_request(sid, request_id):
+        return {"success": False, "message": "Not authorized to call in this chat"}
+    session = await sio.get_session(sid)
+    payload = {
+        key: value for key, value in data.items()
+        if key in ("request_id", "description", "candidate", "call_type")
+    }
+    payload["user_id"] = session["user_id"]
+    await sio.emit(event, payload, room=f"chat_{request_id}", skip_sid=sid)
+    return {"success": True}
+
+
+@sio.event
+async def call_offer(sid, data):
+    return await _relay_call_event(sid, data, "call_offer")
+
+
+@sio.event
+async def call_answer(sid, data):
+    return await _relay_call_event(sid, data, "call_answer")
+
+
+@sio.event
+async def ice_candidate(sid, data):
+    return await _relay_call_event(sid, data, "ice_candidate")
+
+
+@sio.event
+async def end_call(sid, data):
+    return await _relay_call_event(sid, data, "end_call")
