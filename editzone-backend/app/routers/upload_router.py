@@ -1,8 +1,10 @@
 import os
 import uuid
 import boto3
+from botocore.exceptions import BotoCoreError, ClientError
 
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+from fastapi.responses import RedirectResponse
 from starlette.concurrency import run_in_threadpool
 
 from app.config import settings
@@ -28,6 +30,18 @@ def _s3_client():
             "aws_secret_access_key": settings.AWS_SECRET_ACCESS_KEY,
         })
     return boto3.client("s3", **kwargs)
+
+
+def _s3_error_message(exc: Exception) -> str:
+    if isinstance(exc, ClientError):
+        code = exc.response.get("Error", {}).get("Code", "")
+        if code in ("InvalidAccessKeyId", "SignatureDoesNotMatch", "AccessDenied"):
+            return "AWS S3 credentials do not have access to the configured bucket"
+        if code in ("NoSuchBucket", "PermanentRedirect"):
+            return "AWS S3 bucket or region is configured incorrectly"
+    if isinstance(exc, BotoCoreError):
+        return "AWS credentials are unavailable or AWS S3 could not be reached"
+    return "AWS S3 operation failed"
 
 
 @router.post("")
@@ -60,12 +74,10 @@ async def upload_file(file: UploadFile = File(...), current_user: dict = Depends
                 Body=contents,
                 ContentType=content_type or "application/octet-stream",
             )
-        except Exception as exc:
-            raise HTTPException(status_code=502, detail="AWS S3 upload failed") from exc
-        base_url = settings.AWS_S3_PUBLIC_BASE_URL.rstrip("/") or (
-            f"https://{settings.AWS_S3_BUCKET}.s3.{settings.AWS_REGION}.amazonaws.com"
-        )
-        file_url = f"{base_url}/{key}"
+        except (BotoCoreError, ClientError) as exc:
+            raise HTTPException(status_code=502, detail=_s3_error_message(exc)) from exc
+        base_url = settings.AWS_S3_PUBLIC_BASE_URL.rstrip("/")
+        file_url = f"{base_url}/{key}" if base_url else f"/api/v1/uploads/s3/{key}"
         storage = "aws_s3"
     else:
         if settings.ENV != "development":
@@ -95,3 +107,21 @@ async def get_uploaded_file(filename: str):
     if not os.path.isfile(filepath):
         raise HTTPException(status_code=404, detail="File not found")
     return FileResponse(filepath)
+
+
+@router.get("/s3/{key:path}")
+async def get_s3_file(key: str):
+    if not settings.AWS_S3_BUCKET:
+        raise HTTPException(status_code=404, detail="AWS S3 storage is not configured")
+    if not key.startswith("editzone/") or ".." in key.split("/"):
+        raise HTTPException(status_code=400, detail="Invalid S3 object key")
+    try:
+        url = await run_in_threadpool(
+            _s3_client().generate_presigned_url,
+            "get_object",
+            Params={"Bucket": settings.AWS_S3_BUCKET, "Key": key},
+            ExpiresIn=900,
+        )
+    except (BotoCoreError, ClientError) as exc:
+        raise HTTPException(status_code=502, detail=_s3_error_message(exc)) from exc
+    return RedirectResponse(url=url, status_code=307)
