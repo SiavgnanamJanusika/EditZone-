@@ -87,7 +87,7 @@ async def send_message(sid, data):
         if not isinstance(file_url, str) or len(file_url) > 2048:
             return {"success": False, "message": "Invalid attachment URL"}
         parsed = urlparse(file_url)
-        if not (file_url.startswith("/api/v1/uploads/file/") or parsed.scheme in ("http", "https")):
+        if not (file_url.startswith(("/api/v1/uploads/file/", "/api/v1/uploads/s3/")) or parsed.scheme in ("http", "https")):
             return {"success": False, "message": "Invalid attachment URL"}
         if file_type not in ("image", "video", "document", "archive", "audio"):
             return {"success": False, "message": "Invalid attachment type"}

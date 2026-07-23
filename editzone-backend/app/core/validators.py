@@ -46,7 +46,7 @@ def get_file_category(filename: str) -> str | None:
 def is_valid_upload_url(value: str) -> bool:
     if not isinstance(value, str) or not value or len(value) > 2048:
         return False
-    if value.startswith("/api/v1/uploads/file/"):
+    if value.startswith(("/api/v1/uploads/file/", "/api/v1/uploads/s3/")):
         return bool(get_file_category(value))
     parsed = urlparse(value)
     return parsed.scheme in ("http", "https") and bool(parsed.netloc) and bool(get_file_category(parsed.path))
